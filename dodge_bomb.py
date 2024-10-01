@@ -34,13 +34,15 @@ def main():
     kk_rct = kk_img.get_rect() 
     kk_rct.center = 300, 200
     bd_img = pg.Surface((20,20))
-    bd_img.set_colorkey((0,0,0))  #四隅の四角を取り除く
+    bd_img.set_colorkey((0,0,0))  # 四隅の四角を取り除く
     pg.draw.circle(bd_img,(255,0,0),(10,10),10)
-    bd_rct = bd_img.get_rect()  #爆弾rectの抽出
+    bd_rct = bd_img.get_rect()  # 爆弾rectの抽出
     bd_rct.centerx = random.randint(0, WIDTH)
     bd_rct.centery = random.randint(0, HEIGHT)
-    vx,vy = +5,+5  #爆弾の速度
-    #bd_img.set_colorkey((0,0,0))
+    vx,vy = +5,+5  # 爆弾の速度
+    ko_img = pg.transform.rotozoom(pg.image.load("fig/6.png"), 0, 0.9)
+    ko_rct = ko_img.get_rect() 
+    ko_rct.center = 300, 200
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -49,11 +51,21 @@ def main():
                 return
         screen.blit(bg_img, [0, 0])  # 背景画像貼り付け
         if kk_rct.colliderect(bd_rct):  
+            go_img = pg.Surface((WIDTH,HEIGHT)) #game overの四角
+            pg.draw.rect(go_img, (0, 0, 0), pg.Rect(0,0,WIDTH,HEIGHT))
+            #go_img.set_colorkey((0, 0, 0))
+            go_rct = go_img.get_rect()  # 爆弾rectの抽出
+            go_img.set_alpha(150)  # 0から255
+            go_fonto = pg.font.Font(None,80) # フォント
+            go_txt = go_fonto.render("GAME OVER",True,(255,255,255))
             #　こうかとんと爆弾が重なっていたら
-            print("game over")
+            screen.blit(go_img,go_rct) 
+            screen.blit(go_txt,[250,200])
+            screen.blit(ko_img,kk_rct)
+            pg.display.update()
+            pg.time.wait(5000)
             return 
         
-
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]  # 横、縦
         # if key_lst[pg.K_UP]:
