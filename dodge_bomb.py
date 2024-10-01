@@ -13,6 +13,7 @@ DELTA ={
     }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+
 def check_bound(obj_rct: pg.Rect) -> tuple[bool,bool]:
     """
     引数：こうかとん　または爆弾のRect
@@ -25,6 +26,32 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool,bool]:
     if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:
         tate = False
     return yoko,tate
+
+
+def gameover(screen):
+    ko_img = pg.transform.rotozoom(pg.image.load("fig/6.png"), 0, 0.9)
+    ko_rct = ko_img.get_rect() 
+    ko_rct.center = 300, 200
+    go_img = pg.Surface((WIDTH,HEIGHT)) #　game overの四角
+    pg.draw.rect(go_img, (0, 0, 0), pg.Rect(0,0,WIDTH,HEIGHT))
+    go_rct = go_img.get_rect()  # 爆弾rectの抽出
+    go_img.set_alpha(150)  # 0から255
+    go_fonto = pg.font.Font(None,80) # フォント
+    go_txt = go_fonto.render("GAME OVER",True,(255,255,255))
+    #　こうかとんと爆弾が重なっていたら
+    screen.blit(go_img,go_rct) 
+    screen.blit(go_txt,[250,200])
+    screen.blit(ko_img,ko_rct)
+    pg.display.update()
+    pg.time.wait(5000)
+    return
+
+
+def kakudai(tmr):
+    avx = vx*bd_accs[min(tmr//500,9)]
+    bd_img = bd_imgs[min(tmr//500,9)]
+    return
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -40,32 +67,17 @@ def main():
     bd_rct.centerx = random.randint(0, WIDTH)
     bd_rct.centery = random.randint(0, HEIGHT)
     vx,vy = +5,+5  # 爆弾の速度
-    ko_img = pg.transform.rotozoom(pg.image.load("fig/6.png"), 0, 0.9)
-    ko_rct = ko_img.get_rect() 
-    ko_rct.center = 300, 200
+    accs = [a for a in range(1,11)]  # 加速度のリスト
     clock = pg.time.Clock()
     tmr = 0
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+            
         screen.blit(bg_img, [0, 0])  # 背景画像貼り付け
         if kk_rct.colliderect(bd_rct):  
-            go_img = pg.Surface((WIDTH,HEIGHT)) #game overの四角
-            pg.draw.rect(go_img, (0, 0, 0), pg.Rect(0,0,WIDTH,HEIGHT))
-            #go_img.set_colorkey((0, 0, 0))
-            go_rct = go_img.get_rect()  # 爆弾rectの抽出
-            go_img.set_alpha(150)  # 0から255
-            go_fonto = pg.font.Font(None,80) # フォント
-            go_txt = go_fonto.render("GAME OVER",True,(255,255,255))
-            #　こうかとんと爆弾が重なっていたら
-            screen.blit(go_img,go_rct) 
-            screen.blit(go_txt,[250,200])
-            screen.blit(ko_img,kk_rct)
-            pg.display.update()
-            pg.time.wait(5000)
-            return 
-        
+            gameover(screen)
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]  # 横、縦
         # if key_lst[pg.K_UP]:
@@ -86,12 +98,16 @@ def main():
         screen.blit(kk_img, kk_rct)  # kk_retに基づいた場所に
         bd_rct.move_ip(vx,vy)
         yoko,tate = check_bound(bd_rct)
-
         if not yoko:
             vx *= -1
         if not tate:
             vy *= -1
-        screen.blit(bd_img, bd_rct)  # kk_retに基づいた場所に
+        for r in range(1,11):  # 爆弾拡大,加速 
+            bd_img = pg.Surface((20*r, 20*r))
+            pg.draw.circle(bd_img,(255,0,0),(10*r, 10*r), 10*r)
+            kakudai()
+
+        screen.blit(bd_img, bd_rct)
         pg.display.update()
         tmr += 1
         clock.tick(50)
