@@ -37,8 +37,8 @@ def main():
     bd_img.set_colorkey((0,0,0))  #四隅の四角を取り除く
     pg.draw.circle(bd_img,(255,0,0),(10,10),10)
     bd_rct = bd_img.get_rect()  #爆弾rectの抽出
-    bd_rct.centerx = random.randint(0,WIDTH)
-    bd_rct.centery = random.randint(0,HEIGHT)
+    bd_rct.centerx = random.randint(0, WIDTH)
+    bd_rct.centery = random.randint(0, HEIGHT)
     vx,vy = +5,+5  #爆弾の速度
     #bd_img.set_colorkey((0,0,0))
     clock = pg.time.Clock()
@@ -48,6 +48,11 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0])  # 背景画像貼り付け
+        if kk_rct.colliderect(bd_rct):  
+            #　こうかとんと爆弾が重なっていたら
+            print("game over")
+            return 
+        
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]  # 横、縦
@@ -69,6 +74,7 @@ def main():
         screen.blit(kk_img, kk_rct)  # kk_retに基づいた場所に
         bd_rct.move_ip(vx,vy)
         yoko,tate = check_bound(bd_rct)
+
         if not yoko:
             vx *= -1
         if not tate:
