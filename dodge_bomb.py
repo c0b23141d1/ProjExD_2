@@ -35,7 +35,7 @@ def gameover(screen):
     go_img = pg.Surface((WIDTH,HEIGHT)) #　game overの四角
     pg.draw.rect(go_img, (0, 0, 0), pg.Rect(0,0,WIDTH,HEIGHT))
     go_rct = go_img.get_rect()  # 爆弾rectの抽出
-    go_img.set_alpha(150)  # 0から255
+    go_img.set_alpha(100)  # 0から255
     go_fonto = pg.font.Font(None,80) # フォント
     go_txt = go_fonto.render("GAME OVER",True,(255,255,255))
     #　こうかとんと爆弾が重なっていたら
